@@ -56,3 +56,7 @@ Memory Protection Modification and Patching:
 Changes the memory protection of the LoadLibraryA function to writable.
 Writes the patch to redirect the function to the hook.
 Restores the original memory protection.
+![memoryaddress](https://github.com/hadiqHus/window-api-hooking/assets/64806441/e849ca23-f3dd-44e7-a15d-244486519b40)
+![processhacker](https://github.com/hadiqHus/window-api-hooking/assets/64806441/c8dc474f-5f98-4772-a309-3829d6026846)
+![loadlibary](https://github.com/hadiqHus/window-api-hooking/assets/64806441/29666196-6279-4b0e-a5e8-8d5cfb519877)
+
