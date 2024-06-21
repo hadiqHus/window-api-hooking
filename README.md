@@ -1,5 +1,5 @@
 # Windows API Hooking
- This code demonstrates a technique known as function hooking. It hooks the LoadLibraryA function in a running notepad.exe process and replaces it with a custom function that prints messages to the console whenever LoadLibraryA is called. Here's a breakdown of how it works:
+ This code demonstrates a windows api hooking. It hooks a dll function in a running process and replaces it with a custom function that prints messages to the console whenever the libary is called. 
 
 Key Components:
 Global Variables and Hook Function:
@@ -29,33 +29,7 @@ main:
 
 This function provides a simple menu to either show the original MessageBox, hook LoadLibraryA in notepad.exe, or exit.
 It waits for the user to open notepad.exe before attempting to hook LoadLibraryA.
-Detailed Steps in HookLoadLibraryInNotepad:
-Process ID Retrieval:
 
-Uses GetProcessIdByName to get the process ID of notepad.exe.
-Process Opening:
-
-Opens the notepad.exe process with OpenProcess to get a handle with all access rights.
-Function Address Retrieval:
-
-Retrieves the address of LoadLibraryA in kernel32.dll using GetProcAddress.
-Reading Original Bytes:
-
-Reads the original bytes at the LoadLibraryA address to store them for later restoration.
-Memory Allocation:
-
-Allocates memory in the notepad.exe process for the hook function and the message string.
-Writing Hook and Message:
-
-Writes the hook function and the message string to the allocated memory in notepad.exe.
-Patch Creation:
-
-Creates a patch that redirects the execution flow from the original LoadLibraryA to the hook function.
-Memory Protection Modification and Patching:
-
-Changes the memory protection of the LoadLibraryA function to writable.
-Writes the patch to redirect the function to the hook.
-Restores the original memory protection.
 ![memoryaddress](https://github.com/hadiqHus/window-api-hooking/assets/64806441/e849ca23-f3dd-44e7-a15d-244486519b40)
 ![processhacker](https://github.com/hadiqHus/window-api-hooking/assets/64806441/c8dc474f-5f98-4772-a309-3829d6026846)
 ![loadlibary](https://github.com/hadiqHus/window-api-hooking/assets/64806441/29666196-6279-4b0e-a5e8-8d5cfb519877)
