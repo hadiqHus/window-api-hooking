@@ -2,20 +2,13 @@
  This code demonstrates a windows api hooking. It hooks a dll function in a running process and replaces it with a custom function that prints messages to the console whenever the libary is called. 
 
 Key Components:
-Global Variables and Hook Function:
-bytesWritten, loadLibraryOriginalBytes, patch, messageMemoryAddress: These are global variables used to manage the hook and store the original bytes of the LoadLibraryA function.
+Global Variables and Hook Function: bytesWritten, loadLibraryOriginalBytes, patch, messageMemoryAddress: These are global variables used to manage the hook and store the original bytes of the LoadLibraryA function.
 HookedLoadLibraryA: This is the hook function that replaces the original LoadLibraryA function. It prints messages to the console and then calls the original LoadLibraryA.
+
 Functions:
-HookedLoadLibraryA:
+HookedLoadLibraryA: This function is called instead of the original LoadLibraryA once the hook is in place. It prints "Ohai from the hooked function" and the name of the library being loaded. It temporarily restores the original LoadLibraryA function, calls it, and then re-applies the hook.
 
-This function is called instead of the original LoadLibraryA once the hook is in place.
-It prints "Ohai from the hooked function" and the name of the library being loaded.
-It temporarily restores the original LoadLibraryA function, calls it, and then re-applies the hook.
-GetProcessIdByName:
-
-This function retrieves the process ID of a running process given its name (e.g., notepad.exe).
-It uses the Toolhelp32 snapshot to iterate over the list of running processes and find the one with the specified name.
-HookLoadLibraryInNotepad:
+GetProcessIdByName: This function retrieves the process ID of a running process given its name (e.g., notepad.exe). It uses the Toolhelp32 snapshot to iterate over the list of running processes and find the one with the specified name.
 
 This function sets up the hook for LoadLibraryA in the notepad.exe process.
 It finds the process ID of notepad.exe and opens the process with OpenProcess.
