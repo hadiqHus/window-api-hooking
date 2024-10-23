@@ -1,6 +1,9 @@
+just type okay 
 #include <iostream>
 #include <Windows.h>
 #include <TlHelp32.h>
+#include <cstdlib>
+#include <ctime>
 
 SIZE_T bytesWritten = 0;
 char loadLibraryOriginalBytes[6] = {};
@@ -8,7 +11,7 @@ char patch[6] = {};
 LPVOID messageMemoryAddress = nullptr;  // Memory address for the message string in the target process
 
 HMODULE __stdcall HookedLoadLibraryA(LPCSTR lpLibFileName) {
-    std::cout << "Ohai from the hooked function\n"; // Print message in the console
+    std::cout << "Hey you found me!\n"; // Print message in the console
     std::cout << "LoadLibraryA called with: " << lpLibFileName << std::endl; // Print intercepted values
 
     // Unpatch LoadLibraryA
@@ -87,7 +90,7 @@ void HookLoadLibraryInNotepad() {
         return;
     }
 
-    const char message[] = "Ohai from the hooked function";
+    const char message[] = "Hey you found me!";
     messageMemoryAddress = VirtualAllocEx(hProcess, NULL, sizeof(message), MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     if (messageMemoryAddress == NULL) {
         std::cerr << "Failed to allocate memory for the message in Notepad process. Error: " << GetLastError() << std::endl;
@@ -139,41 +142,48 @@ void HookLoadLibraryInNotepad() {
         std::cerr << "Failed to restore memory protection. Error: " << GetLastError() << std::endl;
     }
 
-    std::cout << "LoadLibraryA hooked successfully in Notepad.\n";
+    std::cout << "LoadLibraryA hooked in Notepad.\n";
     std::cout << "LoadLibraryA memory address: " << loadLibraryAddr << std::endl;
     std::cout << "Message memory address: " << messageMemoryAddress << std::endl;
 
     CloseHandle(hProcess);
 }
 
-int main() {
-    int choice;
 
+
+// Function to generate a random string of length 'n'
+std::string generateRandomString(int n) {
+    std::string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    std::string randomString;
+
+    for (int i = 0; i < n; ++i) {
+        randomString += characters[rand() % characters.size()];
+    }
+
+    return randomString;
+}
+
+int main() {
+    int choice; 
+    srand((unsigned)time(0));
     do {
-        std::cout << "Menu:\n";
-        std::cout << "1. Show original MessageBox\n";
-        std::cout << "2. Hook LoadLibraryA in Notepad\n";
-        std::cout << "3. Exit\n";
-        std::cout << "Enter your choice: ";
+        std::string randomChars = generateRandomString(40000);
+        std::cout << "<<--------------------1 or 2-------------------->>\n" << randomChars << std::endl;
         std::cin >> choice;
 
         switch (choice) {
         case 1:
-            MessageBoxA(NULL, "This is the original MessageBox", "Original", MB_OK);
-            break;
-        case 2:
-            std::cout << "Please open Notepad manually before continuing.\n";
             system("pause");
             HookLoadLibraryInNotepad();
             break;
-        case 3:
-            std::cout << "Exiting...\n";
+        case 2:
+            std::cout << "Quitting\n";
             break;
         default:
-            std::cout << "Invalid choice. Please try again.\n";
+            std::string randomChars = generateRandomString(40000);
             break;
         }
-    } while (choice != 3);
+    } while (choice != 2);
 
     return 0;
 }
