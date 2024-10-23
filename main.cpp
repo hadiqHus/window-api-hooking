@@ -13,16 +13,12 @@ LPVOID messageMemoryAddress = nullptr;  // Memory address for the message string
 HMODULE __stdcall HookedLoadLibraryA(LPCSTR lpLibFileName) {
     std::cout << "Hey you found me!\n"; // Print message in the console
     std::cout << "LoadLibraryA called with: " << lpLibFileName << std::endl; // Print intercepted values
-
     // Unpatch LoadLibraryA
     WriteProcessMemory(GetCurrentProcess(), (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA"), loadLibraryOriginalBytes, sizeof(loadLibraryOriginalBytes), &bytesWritten);
-
     // Call the original LoadLibraryA
     HMODULE result = LoadLibraryA(lpLibFileName);
-
     // Repatch LoadLibraryA
     WriteProcessMemory(GetCurrentProcess(), (LPVOID)GetProcAddress(GetModuleHandleA("kernel32.dll"), "LoadLibraryA"), patch, sizeof(patch), &bytesWritten);
-
     return result;
 }
 
@@ -34,7 +30,6 @@ DWORD GetProcessIdByName(const wchar_t* processName) {
     if (snapshot == INVALID_HANDLE_VALUE) {
         return 0;
     }
-
     if (Process32First(snapshot, &processEntry)) {
         do {
             if (wcscmp(processEntry.szExeFile, processName) == 0) {
@@ -43,7 +38,6 @@ DWORD GetProcessIdByName(const wchar_t* processName) {
             }
         } while (Process32Next(snapshot, &processEntry));
     }
-
     CloseHandle(snapshot);
     return 0;
 }
@@ -54,7 +48,7 @@ void HookLoadLibraryInNotepad() {
         std::cerr << "Notepad is not running." << std::endl;
         return;
     }
-
+    
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
     if (hProcess == NULL) {
         std::cerr << "Failed to open Notepad process. Error: " << GetLastError() << std::endl;
@@ -67,7 +61,6 @@ void HookLoadLibraryInNotepad() {
         CloseHandle(hProcess);
         return;
     }
-
     LPVOID loadLibraryAddr = (LPVOID)GetProcAddress(hKernel32, "LoadLibraryA");
     if (loadLibraryAddr == NULL) {
         std::cerr << "Failed to get address of LoadLibraryA. Error: " << GetLastError() << std::endl;
@@ -76,13 +69,11 @@ void HookLoadLibraryInNotepad() {
     }
 
     SIZE_T bytesRead = 0;
-
     if (!ReadProcessMemory(hProcess, loadLibraryAddr, loadLibraryOriginalBytes, sizeof(loadLibraryOriginalBytes), &bytesRead)) {
         std::cerr << "Failed to read original bytes from LoadLibraryA. Error: " << GetLastError() << std::endl;
         CloseHandle(hProcess);
         return;
     }
-
     void* remoteMemory = VirtualAllocEx(hProcess, NULL, sizeof(void*), MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (remoteMemory == NULL) {
         std::cerr << "Failed to allocate memory in Notepad process. Error: " << GetLastError() << std::endl;
@@ -98,7 +89,6 @@ void HookLoadLibraryInNotepad() {
         CloseHandle(hProcess);
         return;
     }
-
     if (!WriteProcessMemory(hProcess, messageMemoryAddress, message, sizeof(message), &bytesWritten)) {
         std::cerr << "Failed to write the message to Notepad process. Error: " << GetLastError() << std::endl;
         VirtualFreeEx(hProcess, remoteMemory, 0, MEM_RELEASE);
@@ -106,7 +96,6 @@ void HookLoadLibraryInNotepad() {
         CloseHandle(hProcess);
         return;
     }
-
     if (!WriteProcessMemory(hProcess, remoteMemory, (void*)&HookedLoadLibraryA, sizeof(void*), NULL)) {
         std::cerr << "Failed to write shellcode to Notepad process. Error: " << GetLastError() << std::endl;
         VirtualFreeEx(hProcess, remoteMemory, 0, MEM_RELEASE);
@@ -128,7 +117,6 @@ void HookLoadLibraryInNotepad() {
         CloseHandle(hProcess);
         return;
     }
-
     if (!WriteProcessMemory(hProcess, loadLibraryAddr, patch, sizeof(patch), &bytesWritten)) {
         std::cerr << "Failed to patch LoadLibraryA. Error: " << GetLastError() << std::endl;
         VirtualProtectEx(hProcess, loadLibraryAddr, sizeof(patch), oldProtect, &oldProtect);
@@ -137,20 +125,14 @@ void HookLoadLibraryInNotepad() {
         CloseHandle(hProcess);
         return;
     }
-
     if (!VirtualProtectEx(hProcess, loadLibraryAddr, sizeof(patch), oldProtect, &oldProtect)) {
         std::cerr << "Failed to restore memory protection. Error: " << GetLastError() << std::endl;
     }
-
     std::cout << "LoadLibraryA hooked in Notepad.\n";
     std::cout << "LoadLibraryA memory address: " << loadLibraryAddr << std::endl;
     std::cout << "Message memory address: " << messageMemoryAddress << std::endl;
-
     CloseHandle(hProcess);
 }
-
-
-
 // Function to generate a random string of length 'n'
 std::string generateRandomString(int n) {
     std::string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -159,7 +141,6 @@ std::string generateRandomString(int n) {
     for (int i = 0; i < n; ++i) {
         randomString += characters[rand() % characters.size()];
     }
-
     return randomString;
 }
 
@@ -170,7 +151,6 @@ int main() {
         std::string randomChars = generateRandomString(40000);
         std::cout << "<<--------------------1 or 2-------------------->>\n" << randomChars << std::endl;
         std::cin >> choice;
-
         switch (choice) {
         case 1:
             system("pause");
@@ -184,6 +164,5 @@ int main() {
             break;
         }
     } while (choice != 2);
-
     return 0;
 }
